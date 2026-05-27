@@ -1,0 +1,163 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Panel de Control - GastroPro";
+    // Extraemos el rol y el usuario activo directamente desde la sesión
+    var actual = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioActivo") ?? "Invitado";
+    var rolActual = HttpContextAccessor.HttpContext?.Session.GetString("RolActivo") ?? "Ninguno";
+}
+
+@if (rolActual == "Ninguno" || string.IsNullOrEmpty(rolActual))
+{
+    <div class="container mt-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow-lg border-0 p-5 bg-dark text-white rounded-3">
+                    <div class="card-body">
+                        <div class="mb-4 text-warning animate-bounce">
+                            <i class="fa-solid fa-user-lock" style="font-size: 4.5rem;"></i>
+                        </div>
+                        <h2 class="fw-bold mb-3">Acceso Restringido - GastroPro</h2>
+                        <p class="text-muted mb-4 fs-6">
+                            Para poder visualizar el panel operacional de la caldería, es obligatorio que elijas tu puesto de trabajo en el sistema.
+                        </p>
+                        <hr class="border-secondary my-4">
+                        <a asp-controller="Usuarios" asp-action="Index" class="btn btn-warning btn-lg fw-bold w-100 shadow-sm py-3">
+                            <i class="fa-solid fa-users me-2"></i> Seleccionar Mi Rol Operativo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="p-5 mb-4 bg-light rounded-3 shadow-sm border-start border-primary border-5">
+        <div class="container-fluid py-3">
+            <h1 class="display-5 fw-bold text-navy">
+                <i class="fa-solid fa-store text-warning me-2"></i> ¡Bienvenida a GastroPro!
+            </h1>
+            <p class="col-md-8 fs-5 text-muted">
+                El sistema inteligente para la gestión de comandas, control de menús y optimización de flujos de tu restaurante.
+            </p>
+            <span class="badge bg-dark px-3 py-2 fs-6 mt-1 shadow-sm">
+                <i class="fa-solid fa-user-shield me-1"></i> Sesión Activa: @actual (@rolActual)
+            </span>
+            <hr class="my-4">
+            <p class="fw-semibold text-secondary">¿Qué deseas gestionar hoy? Elige una opción rápida abajo según tus permisos:</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 transition-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-shape bg-primary-light text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 30px;">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Carta de Platos</h5>
+                    <p class="card-text text-muted small">Visualiza el menú completo disponible, actualiza los precios o añade nuevas especialidades del día.</p>
+
+                    <a asp-controller="Platos" asp-action="Index" class="btn btn-primary w-100 mt-2">
+                        <i class="fa-solid fa-eye me-1"></i> Ver Menú
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 transition-card">
+                <div class="card-body text-center p-4">
+                    <div class="icon-shape bg-success-light text-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 30px;">
+                        <i class="fa-solid fa-square-plus"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Tomar Nueva Orden</h5>
+                    <p class="card-text text-muted small">Registra de manera inmediata el pedido de una mesa especificando el plato y la cantidad solicitada.</p>
+
+                    @if (rolActual == "Mozo" || rolActual == "Administrador")
+                    {
+                        <a asp-controller="Pedidos" asp-action="Create" class="btn btn-success w-100 mt-2 fw-bold">
+                            <i class="fa-solid fa-bell me-1"></i> Crear Comanda
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary w-100 mt-2 disabled" title="Función exclusiva de Mozos">
+                            <i class="fa-solid fa-ban me-1"></i> Solo para Mozos
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 transition-card">
+                <div class="card-body text-center p-4">
+                    @if (rolActual == "Cajero" || rolActual == "Administrador")
+                    {
+                        <div class="icon-shape bg-success-light text-success rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 30px;">
+                            <i class="fa-solid fa-cash-register"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Módulo de Caja Financiera</h5>
+                        <p class="card-text text-muted small">Procesa las cuentas por cobrar de las mesas ocupadas, emite comprobantes y ejecuta el arqueo de caja diario.</p>
+
+                        <a asp-controller="Pagos" asp-action="Index" class="btn btn-success w-100 mt-2 fw-bold">
+                            <i class="fa-solid fa-vault me-1"></i> Ir a Cobrar y Cerrar
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="icon-shape bg-warning-light text-warning rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 30px;">
+                            <i class="fa-solid fa-rectangle-list"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Monitor de Cocina</h5>
+                        <p class="card-text text-muted small">Sigue en tiempo real las órdenes activas de las mesas, calcula importes y monitorea los estados.</p>
+
+                        <a asp-controller="Pedidos" asp-action="Index" class="btn btn-warning text-dark w-100 mt-2">
+                            <i class="fa-solid fa-list-check me-1"></i> Ver Pedidos Activos
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 justify-content-center">
+        <div class="col-md-4">
+            <a asp-controller="Usuarios" asp-action="CerrarSesion" class="btn btn-outline-danger w-100 p-2 fw-bold shadow-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Salir / Cambiar Operador
+            </a>
+        </div>
+    </div>
+}
+
+<style>
+    .bg-primary-light {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+
+    .bg-success-light {
+        background-color: rgba(25, 135, 84, 0.1);
+    }
+
+    .bg-warning-light {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .text-navy {
+        color: #002347;
+    }
+
+    /* Animación sutil de elevación cuando el usuario pasa el mouse */
+    .transition-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+        .transition-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+</style>

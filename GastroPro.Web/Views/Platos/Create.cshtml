@@ -1,0 +1,43 @@
+﻿@model GastroPro.Domain.Entities.Plato
+
+@{
+    ViewData["Title"] = "Agregar Plato";
+}
+
+<div class="card shadow-sm max-width-600 mx-auto mt-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Agregar Nuevo Plato</h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label">Nombre del Plato</label>
+                <input asp-for="Nombre" class="form-content form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Precio" class="form-label">Precio (S/)</label>
+                <input asp-for="Precio" type="number" step="0.1" class="form-control" />
+                <span asp-validation-for="Precio" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Categoria" class="form-label">Categoría</label>
+                <select asp-for="Categoria" class="form-select">
+                    <option value="Caldos">Caldos</option>
+                    <option value="Menu">Menu</option>
+                    <option value="Segundos">Segundos</option>
+                    <option value="Bebidas">Bebidas</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">Regresar</a>
+                <button type="submit" class="btn btn-primary">Guardar Plato</button>
+            </div>
+        </form>
+    </div>
+</div>

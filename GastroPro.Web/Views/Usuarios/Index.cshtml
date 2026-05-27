@@ -1,0 +1,103 @@
+﻿@model IEnumerable<GastroPro.Domain.Entities.Usuario>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Control de Usuarios";
+    var actual = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioActivo") ?? "Invitado";
+    var rolActual = HttpContextAccessor.HttpContext?.Session.GetString("RolActivo") ?? "Ninguno";
+}
+
+<div class="row mt-4">
+    @if (TempData["ErrorPassword"] != null)
+    {
+        <div class="col-12">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorPassword"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-light p-4 mb-4">
+            <h5 class="fw-bold text-secondary text-uppercase small mb-1">Operador Actual</h5>
+            <h3 class="text-primary fw-bold mb-1"><i class="fa-solid fa-user-circle me-1"></i> @actual</h3>
+            <span class="badge bg-dark px-2 py-1 mb-3 align-self-start">@rolActual</span>
+
+            <hr>
+
+            @if (rolActual == "Administrador")
+            {
+                <a asp-action="Create" class="btn btn-success fw-bold w-100 mb-2">
+                    <i class="fa-solid fa-user-plus me-1"></i> Registrar Nuevo Personal
+                </a>
+            }
+            else
+            {
+                <div class="alert alert-warning small mb-0 p-2">
+                    <i class="fa-solid fa-lock me-1"></i> Solo la Administradora puede registrar personal o editar catálogos de platos.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-users text-primary me-2"></i> Selección de Personal Operativo</h4>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">Nombre del Empleado</th>
+                            <th>Puesto / Rol</th>
+                            <th class="text-center">Operaciones</th>
+                            <th class="text-end pe-4">Acción de Ingreso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-navy">@u.Nombre</td>
+                                <td>
+                                    <span class="badge @(u.Rol == "Administrador" ? "bg-danger" : u.Rol == "Cajero" ? "bg-success" : "bg-info") px-3 py-2">
+                                        @u.Rol
+                                    </span>
+                                </td>
+                                
+                                <td class="text-center">
+                                    @if (rolActual == "Administrador")
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@u.UsuarioId" class="btn btn-warning btn-sm fw-bold px-2 shadow-sm">
+                                            <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small"><i class="fa-solid fa-ban"></i> Bloqueado</span>
+                                    }
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <form asp-action="CambiarUsuarioActivo" method="post" class="d-flex justify-content-end align-items-center gap-2 m-0">
+                                        <input type="hidden" name="id" value="@u.UsuarioId" />
+
+                                        @if ((u.Rol == "Administrador" || u.Rol == "Cajero") && actual != u.Nombre)
+                                        {
+                                            <input type="password" name="passwordInput" class="form-control form-control-sm shadow-sm" placeholder="Clave de acceso" style="width: 140px;" required />
+                                        }
+
+                                        <button type="submit" class="btn btn-sm @(actual == u.Nombre ? "btn-dark disabled" : "btn-outline-primary fw-bold") px-3">
+                                            @(actual == u.Nombre ? "✓ En uso" : "Ingresar")
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

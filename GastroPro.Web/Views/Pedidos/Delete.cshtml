@@ -1,0 +1,29 @@
+﻿@model GastroPro.Domain.Entities.Pedido
+
+@{
+    ViewData["Title"] = "Cancelar Comanda";
+}
+
+<div class="card shadow mx-auto mt-5" style="max-width: 450px; border-top: 5px solid #dc3545;">
+    <div class="card-body text-center p-4">
+        <div class="text-danger mb-2" style="font-size: 45px;">
+            <i class="fa-solid fa-ban"></i>
+        </div>
+        <h4 class="fw-bold text-danger mb-3">¿Anular esta comanda?</h4>
+        <p class="text-muted small">Esta acción eliminará el plato solicitado de la Mesa #@Model.NumeroMesa de forma irreversible.</p>
+
+        <div class="bg-light p-3 rounded text-start border mb-4">
+            <p class="mb-1"><strong>Mesa:</strong> #@Model.NumeroMesa</p>
+            <p class="mb-1"><strong>Plato pedido:</strong> @Model.Plato?.Nombre</p>
+            <p class="mb-0"><strong>Cantidad:</strong> @Model.Cantidad unidad(es)</p>
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="PedidoId" />
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">Conservar orden</a>
+                <button type="submit" class="btn btn-danger px-4">Sí, Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>

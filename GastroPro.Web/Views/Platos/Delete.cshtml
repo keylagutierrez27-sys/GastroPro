@@ -1,0 +1,29 @@
+﻿@model GastroPro.Domain.Entities.Plato
+
+@{
+    ViewData["Title"] = "Eliminar Plato";
+}
+
+<div class="card shadow mx-auto mt-4" style="max-width: 500px; border-top: 5px solid #dc3545;">
+    <div class="card-body text-center p-4">
+        <div class="text-danger mb-3" style="font-size: 50px;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="card-title fw-bold text-danger">¿Eliminar este plato?</h3>
+        <p class="text-muted">Esta acción quitará el plato permanentemente del menú digital.</p>
+
+        <div class="bg-light p-3 rounded my-3 text-start border">
+            <p class="mb-1"><strong>Plato:</strong> @Model.Nombre</p>
+            <p class="mb-1"><strong>Precio actual:</strong> S/ @Model.Precio.ToString("F2")</p>
+            <p class="mb-0"><strong>Categoría:</strong> @Model.Categoria</p>
+        </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="PlatoId" />
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar y volver</a>
+                <button type="submit" class="btn btn-danger px-4">Sí, Eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>

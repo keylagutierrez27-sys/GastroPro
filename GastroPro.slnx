@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Elementos de la solución/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="GastroPro.Domain/GastroPro.Domain.csproj" />
+  <Project Path="GastroPro.Infrastructure/GastroPro.Infrastructure.csproj" />
+  <Project Path="GastroPro.UnitTests/GastroPro.UnitTests.csproj" Id="a7a5a7a7-3682-45d8-a106-da1bec564414" />
+  <Project Path="GastroPro.Web/GastroPro.Web.csproj" />
+</Solution>

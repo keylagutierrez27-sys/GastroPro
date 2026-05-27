@@ -1,0 +1,219 @@
+﻿@model IEnumerable<GastroPro.Domain.Entities.Pago>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Gestión de Caja";
+    var diaActivo = ViewBag.DiaActivo as GastroPro.Domain.Entities.CierreCaja;
+    var historialCierres = ViewBag.HistorialCierres as IEnumerable<GastroPro.Domain.Entities.CierreCaja>;
+
+    // Extraemos las variables de sesión para el blindaje de seguridad perimetral
+    var actual = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioActivo") ?? "Invitado";
+    var rolActual = HttpContextAccessor.HttpContext?.Session.GetString("RolActivo") ?? "Ninguno";
+}
+
+@if (rolActual == "Cajero" || rolActual == "Administrador")
+{
+    @if (TempData["ErrorCaja"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mt-3 border-0 border-start border-danger border-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-triangle-exclamation text-danger fs-4 me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-0 text-danger">Operación Cancelada</h6>
+                    <span class="small text-dark">@TempData["ErrorCaja"]</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ExitoCaja"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mt-3 border-0 border-start border-success border-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-circle-check text-success fs-4 me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-0 text-success">¡Acción Exitosa!</h6>
+                    <span class="small text-dark">@TempData["ExitoCaja"]</span>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-4 mt-1">
+        <div class="col-md-5">
+            <div class="p-4 bg-dark text-white rounded shadow-sm h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <span class="text-warning text-uppercase small fw-bold font-monospace">
+                        <i class="fa-solid fa-circle text-success me-1"></i> Día Comercial Activo
+                    </span>
+                    <h1 class="display-5 fw-bold text-success mt-1">S/ @diaActivo?.TotalVendido.ToString("F2")</h1>
+                    <p class="mb-0 text-muted small">Iniciado el: @diaActivo?.FechaApertura.ToString("dd/MM/yyyy hh:mm tt")</p>
+                    <span class="badge bg-secondary mt-2 small">Cajero(a): @actual</span>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-3">
+                    <form asp-action="CerrarDiaComercial" method="post" onsubmit="return confirm('¿Estás segura de realizar el cierre del día comercial? Esto reiniciará la caja actual a S/ 0.00.');">
+                        <button type="submit" class="btn btn-danger btn-sm fw-bold w-100 shadow">
+                            <i class="fa-solid fa-lock me-2"></i> Cerrar Día Comercial
+                        </button>
+                    </form>
+
+                    <a asp-action="ImprimirCarta" asp-controller="Pagos" target="_blank" class="btn btn-sm btn-outline-light fw-bold shadow-sm w-100">
+                        <i class="fa-solid fa-print me-2"></i> Imprimir Carta Física
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 shadow-sm border-0 bg-primary text-white p-3 text-center d-flex flex-column justify-content-center align-items-center">
+                <div class="mb-2">
+                    <i class="fa-solid fa-cash-register" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-1">Módulo de Facturación</h5>
+                <p class="mb-3 text-white-50" style="font-size: 0.8rem;">Cobra comandas pendientes del salón.</p>
+
+                <a asp-action="Index" asp-controller="Pedidos" class="btn btn-light text-primary fw-bold w-100 shadow-sm py-2">
+                    <i class="fa-solid fa-hand-holding-dollar me-2"></i> Cobrar una Mesa
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 bg-light p-3 d-flex flex-column justify-content-between">
+                <h6 class="text-secondary fw-bold mb-2">
+                    <i class="fa-solid fa-calculator me-2 text-primary"></i>Balance del Arqueo Digital
+                </h6>
+
+                <div class="d-flex justify-content-between align-items-center mb-1 border-bottom pb-1">
+                    <span class="small text-muted"><i class="fa-solid fa-money-bill text-success me-2"></i> Efectivo:</span>
+                    <span class="fw-bold text-dark">S/ @(ViewBag.TotalEfectivo?.ToString("F2") ?? "0.00")</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-1 border-bottom pb-1">
+                    <span class="small text-muted"><i class="fa-solid fa-mobile-screen-button text-purple me-2" style="color: #7425b4;"></i> Yape:</span>
+                    <span class="fw-bold text-dark">S/ @(ViewBag.TotalYape?.ToString("F2") ?? "0.00")</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-1 border-bottom pb-1">
+                    <span class="small text-muted"><i class="fa-solid fa-qrcode text-info me-2"></i> Plin:</span>
+                    <span class="fw-bold text-dark">S/ @(ViewBag.TotalPlin?.ToString("F2") ?? "0.00")</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small text-muted"><i class="fa-solid fa-credit-card text-primary me-2"></i> Tarjetas:</span>
+                    <span class="fw-bold text-dark">S/ @(ViewBag.TotalTarjeta?.ToString("F2") ?? "0.00")</span>
+                </div>
+
+                <div class="bg-white rounded p-1 mt-2 border text-center">
+                    <small class="text-secondary font-monospace d-block" style="font-size: 0.75rem;">
+                        Transacciones del Turno: <strong>@Model.Count() Ventas</strong>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="text-navy fw-bold mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i> Detalle de Ventas del Día Abierto</h4>
+    <div class="card shadow-sm border-0 mb-5">
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small text-uppercase">
+                    <tr>
+                        <th class="ps-4">Hora</th>
+                        <th>Mesa</th>
+                        <th>Método de Pago</th>
+                        <th>Nro. Operación</th>
+                        <th class="text-end pe-4">Monto Pagado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Aún no se registran cobranzas en este día comercial.</td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">@item.FechaPago.ToString("hh:mm tt")</td>
+                            <td class="fw-bold">Mesa #@item.NumeroMesa</td>
+                            <td><span class="badge bg-secondary px-3 py-2">@item.MetodoPago</span></td>
+                            <td class="font-monospace text-muted small">@item.NroOperacion</td>
+                            <td class="text-end pe-4 fw-bold text-success">S/ @item.TotalPagado.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <h4 class="text-secondary fw-bold mb-3"><i class="fa-solid fa-archive me-2"></i> Historial de Días Comerciales Cerrados (Cierres de Caja)</h4>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <table class="table table-striped align-middle mb-0 small">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">ID Turno</th>
+                        <th>Fecha / Hora Apertura</th>
+                        <th>Fecha / Hora Cierre</th>
+                        <th>Estado</th>
+                        <th class="text-end pe-4">Total Recaudado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in historialCierres ?? new List<GastroPro.Domain.Entities.CierreCaja>())
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold font-monospace">#@c.CierreCajaId.ToString("D4")</td>
+                            <td>@c.FechaApertura.ToString("dd/MM/yyyy hh:mm tt")</td>
+                            <td>@(c.FechaCierre?.ToString("dd/MM/yyyy hh:mm tt") ?? "Sigue en curso")</td>
+                            <td>
+                                <span class="badge @(c.Estado == "Abierto" ? "bg-success" : "bg-danger")">@c.Estado</span>
+                            </td>
+                            <td class="text-end pe-4 fw-bold @(c.Estado == "Abierto" ? "text-success" : "text-dark")">
+                                S/ @c.TotalVendido.ToString("F2")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow border-0 rounded-3 p-5 bg-light">
+                    <div class="card-body">
+                        <div class="text-danger mb-4">
+                            <i class="fa-solid fa-shield-halved" style="font-size: 4.5rem;"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-2">Área Financiera Restringida</h3>
+                        <p class="text-secondary fs-6">
+                            Lo sentimos, tu perfil actual como <strong>@rolActual</strong> no posee autorizaciones suficientes para visualizar los montos recaudados, registrar cobranzas ni efectuar el arqueo definitivo de la caja.
+                        </p>
+                        <div class="alert alert-warning border-0 small text-start my-4">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> <strong>Aviso del Sistema:</strong> Este intento de acceso ha sido registrado bajo el usuario de control <strong>@actual</strong> con fines de auditoría del software.
+                        </div>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-dark btn-lg fw-bold w-100 shadow-sm py-2">
+                            <i class="fa-solid fa-house me-2"></i> Regresar al Panel de Control
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .text-navy {
+        color: #002347;
+    }
+</style>

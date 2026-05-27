@@ -1,0 +1,86 @@
+﻿@model GastroPro.Domain.Entities.Pedido
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Registrar Pedido";
+    // Extraemos el rol activo del operador para aplicar los filtros de seguridad en el cliente
+    var rolActual = HttpContextAccessor.HttpContext?.Session.GetString("RolActivo") ?? "Ninguno";
+}
+
+<div class="card shadow-sm max-width-600 mx-auto mt-4">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="fas fa-shopping-basket"></i> Registrar Nueva Comanda</h4>
+    </div>
+    <div class="card-body">
+
+        @if (rolActual == "Mozo" || rolActual == "Administrador")
+        {
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label asp-for="NumeroMesa" class="form-label fw-bold">Número de Mesa</label>
+                    <input asp-for="NumeroMesa" class="form-control" placeholder="Ej. 5" required />
+                    <span asp-validation-for="NumeroMesa" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PlatoId" class="form-label fw-bold">Seleccionar Plato del Menú</label>
+                    <select asp-for="PlatoId" class="form-select" asp-items="ViewBag.PlatoId" required></select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Cantidad" class="form-label fw-bold">Cantidad</label>
+                    <input asp-for="Cantidad" type="number" class="form-control" value="1" min="1" required />
+                    <span asp-validation-for="Cantidad" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success fw-bold">
+                        <i class="fas fa-check-circle"></i> Confirmar Orden
+                    </button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-danger border-0 shadow-sm mb-4 p-3 d-flex align-items-center gap-3">
+                <div class="fs-3"><i class="fas fa-ban text-danger"></i></div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-danger">Área Restringida por Privilegios</h6>
+                    <small class="text-dark">Tu rol operativo actual es <strong>@rolActual</strong>. Los operadores de caja no poseen facultades para registrar comandas de mesas.</small>
+                </div>
+            </div>
+
+            <form onsubmit="return false;">
+                <div class="mb-3 opacity-75">
+                    <label class="form-label text-muted">Número de Mesa</label>
+                    <input class="form-control bg-light" placeholder="Ej. 5" disabled />
+                </div>
+
+                <div class="mb-3 opacity-75">
+                    <label class="form-label text-muted">Seleccionar Plato del Menú</label>
+                    <select class="form-select bg-light" disabled>
+                        <option>--- Catálogo deshabilitado ---</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 opacity-75">
+                    <label class="form-label text-muted">Cantidad</label>
+                    <input type="number" class="form-control bg-light" value="1" disabled />
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Inicio
+                    </a>
+                    <button type="button" class="btn btn-success opacity-50 disabled" style="cursor: not-allowed;">
+                        <i class="fas fa-lock"></i> Acción Bloqueada
+                    </button>
+                </div>
+            </form>
+        }
+    </div>
+</div>

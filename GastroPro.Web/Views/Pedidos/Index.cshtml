@@ -1,0 +1,97 @@
+﻿@model IEnumerable<GastroPro.Domain.Entities.Pedido>
+
+@{
+    ViewData["Title"] = "Monitor de Comandas";
+
+    // FILTRO CRÍTICO: Filtramos para ignorar los pagados y luego agrupamos dinámicamente por número de mesa
+    var pedidosActivos = Model.Where(p => p.Estado != "Pagado").ToList();
+    var pedidosPorMesa = pedidosActivos.GroupBy(p => p.NumeroMesa).OrderBy(g => g.Key);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary"><i class="fa-solid fa-rectangle-list"></i> Panel de Comandas por Mesa</h2>
+    <a asp-action="Create" class="btn btn-success shadow-sm"><i class="fas fa-plus-circle"></i> Tomar Nuevo Pedido</a>
+</div>
+
+@if (!pedidosActivos.Any())
+{
+    <div class="alert alert-info text-center shadow-sm">
+        <i class="fa-solid fa-circle-info fs-4 mb-2"></i><br>No hay pedidos activos ni mesas pendientes por cobrar en este momento.
+    </div>
+}
+else
+{
+    @foreach (var mesaGroup in pedidosPorMesa)
+    {
+        <div class="card shadow-sm mb-4 border-start border-primary border-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold text-navy">
+                    <i class="fa-solid fa-chair text-primary me-2"></i> MESA #@mesaGroup.Key
+                </h5>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary rounded-pill">@mesaGroup.Count() plato(s) solicitado(s)</span>
+
+                    <a asp-controller="Pagos" asp-action="CobrarMesa" asp-route-mesa="@mesaGroup.Key" class="btn btn-sm btn-success fw-bold shadow-sm">
+                        <i class="fa-solid fa-cash-register me-1"></i> Cobrar Cuenta
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-secondary small text-uppercase">
+                        <tr>
+                            <th class="ps-4">Plato</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Estado de Preparación</th>
+                            <th class="text-center" style="width: 220px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in mesaGroup)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">@item.Plato?.Nombre</td>
+                                <td>S/ @item.Plato?.Precio.ToString("F2")</td>
+                                <td class="fw-semibold">x @item.Cantidad</td>
+                                <td class="text-success fw-bold">S/ @((item.Cantidad * (item.Plato?.Precio ?? 0)).ToString("F2"))</td>
+                                <td>
+                                    @if (item.Estado == "Pendiente")
+                                    {
+                                        <span class="badge bg-warning text-dark px-3 py-2"><i class="fa-regular fa-clock me-1"></i> Pendiente</span>
+                                    }
+                                    else if (item.Estado == "En Cocina")
+                                    {
+                                        <span class="badge bg-info text-white px-3 py-2"><i class="fa-solid fa-fire-burner me-1"></i> En Cocina</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success text-white px-3 py-2"><i class="fa-solid fa-circle-check me-1"></i> Entregado</span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.PedidoId" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-bars-progress me-1"></i> Estado
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.PedidoId" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash-alt"></i> Cancelar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+
+<style>
+    .text-navy {
+        color: #0a2540;
+    }
+</style>

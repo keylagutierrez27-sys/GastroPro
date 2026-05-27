@@ -1,0 +1,87 @@
+﻿@model GastroPro.Domain.Entities.Usuario
+
+@{
+    ViewData["Title"] = "Editar Personal";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="fas fa-user-edit"></i> Editar Datos de Personal</h4>
+                </div>
+                <div class="card-body">
+                    
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        <input type="hidden" asp-for="UsuarioId" />
+
+                        <div class="mb-3">
+                            <label asp-for="Nombre" class="form-label font-weight-bold">Nombre Completo</label>
+                            <input asp-for="Nombre" class="form-control" placeholder="Ej. Roxana Palomino" required />
+                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Rol" class="form-label font-weight-bold">Rol Operativo</label>
+                            <select asp-for="Rol" class="form-select form-control" id="cboRol" required>
+                                <option value="Mozo">Mozo</option>
+                                <option value="Cajero">Cajero</option>
+                                <option value="Administrador">Administrador</option>
+                            </select>
+                            <span asp-validation-for="Rol" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3" id="seccionContrasena">
+                            <label asp-for="Contrasena" class="form-label font-weight-bold">Contraseña de Acceso</label>
+                            <input asp-for="Contrasena" type="password" class="form-control" id="txtContrasena" placeholder="Clave de seguridad" />
+                            <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                            <div class="alert alert-info py-1 px-2 mt-2 small" id="alertaClave">
+                                <i class="fas fa-info-circle"></i> Las contraseñas son obligatorias para Administradores y Cajeros.
+                            </div>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver a la Lista
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cboRol = document.getElementById("cboRol");
+            const txtContrasena = document.getElementById("txtContrasena");
+            const alertaClave = document.getElementById("alertaClave");
+
+            function evaluarRol() {
+                if (cboRol.value === "Mozo") {
+                    txtContrasena.required = false;
+                    alertaClave.classList.replace("alert-info", "alert-warning");
+                    alertaClave.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Los Mozos entran directo sin clave. Puedes dejar este campo vacío.";
+                } else {
+                    txtContrasena.required = true;
+                    alertaClave.classList.replace("alert-warning", "alert-info");
+                    alertaClave.innerHTML = "<i class='fas fa-info-circle'></i> Las contraseñas son obligatorias para Administradores y Cajeros.";
+                }
+            }
+
+            cboRol.addEventListener("change", evaluarRol);
+            evaluarRol(); // Ejecución inicial al cargar la pantalla
+        });
+    </script>
+}

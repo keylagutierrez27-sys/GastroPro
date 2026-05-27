@@ -1,0 +1,48 @@
+﻿@model GastroPro.Domain.Entities.Usuario
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Nuevo Personal";
+    var rol = HttpContextAccessor.HttpContext?.Session.GetString("RolActivo") ?? "Ninguno";
+}
+
+@if (rol != "Administrador")
+{
+    <div class="alert alert-danger text-center mt-5 shadow">
+        <h4><i class="fa-solid fa-ban"></i> Acceso Denegado</h4>
+        <p>No tienes los permisos de Administradora necesarios para registrar empleados.</p>
+        <a href="/" class="btn btn-primary mt-2">Volver al Inicio</a>
+    </div>
+}
+else
+{
+    <div class="card shadow mx-auto mt-4" style="max-width: 450px;">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-gear me-2"></i> Registrar Empleado</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label fw-bold text-secondary">Nombre Completo</label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ej. Carlos Mendoza" required />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Rol" class="form-label fw-bold text-secondary">Rol asignado</label>
+                    <select asp-for="Rol" class="form-select">
+                        <option value="Mozo">👨‍🍳 Mozo / Mesero</option>
+                        <option value="Cajero">💵 Encargado de Caja</option>
+                        <option value="Administrador">👑 Administrador general</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Contrasena" class="form-label fw-bold text-secondary">Contraseña (Solo Administradores)</label>
+                    <input asp-for="Contrasena" type="password" class="form-control" placeholder="Dejar vacío para Mozos" />
+                </div>
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Regresar</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">Guardar Empleado</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

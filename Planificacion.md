@@ -1,7 +1,7 @@
 # 📋 Planificación y Diseño Web — GastroPro
 ### Sistema Integrado de Control Digital de Comandas y Gestión de Pagos
 
-> **Estudiante:** Keyla Jhazym Gutiérrez Gutiérrez · Código: 27220300  
+> **Estudiante:** Keyla J. Gutiérrez Gutiérrez · 
 > **Asignatura:** IS 489 – Pruebas y Aseguramiento de la Calidad  
 > **Docente:** Mg. Richard Zapata Casaverde  
 > **Universidad:** UNSCH — Ayacucho, Perú · 2026
@@ -640,4 +640,4 @@ P-01 (Inicio / Selección de Rol)
 ---
 
 *© 2026 · GastroPro — Planificación y Diseño Web*  
-*Elaborado por: Keyla Jhazym Gutiérrez Gutiérrez · IS 489 · UNSCH · Ayacucho, Perú*
+*Elaborado por: Keyla J. Gutiérrez Gutiérrez · IS 489 · UNSCH · Ayacucho, Perú*

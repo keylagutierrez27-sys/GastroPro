@@ -93,7 +93,7 @@ Perfil estratégico con acceso exclusivo a la configuración de seguridad, gesti
 | IDE | Visual Studio 2026 |
 | Framework Web | ASP.NET Core MVC |
 | ORM | Entity Framework Core (Code-First) |
-| Base de Datos | SQL Server 2022 + SSMS |
+| Base de Datos | SQL Server 2022 |
 | UI | Bootstrap 5 (Mobile-First) |
 | Vistas | Razor Pages (.cshtml) |
 | Framework de Pruebas | xUnit (.NET 10) |

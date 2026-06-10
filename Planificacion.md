@@ -39,7 +39,7 @@ Los establecimientos gastronómicos de Ayacucho (calderías, restaurantes de men
 ### 1.2 Cronograma de Desarrollo (Scrum)
 
 | Sprint | Nombre  | Entregables clave |
-|--------|--------|--------|-------------------|
+|--------|--------|-------------------|
 | **Sprint 0** | Planificación y Arquitectura | Requisitos, modelo ER, wireframes, configuración del repo |
 | **Sprint 1** | Dominio e Infraestructura | Entidades DDD, IUnitOfWork, EF Core Code-First, migraciones, seed |
 | **Sprint 2** | Capa Web (Controllers + Views) | Todos los controladores, vistas Razor, Bootstrap 5 Mobile-First |
